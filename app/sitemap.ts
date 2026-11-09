@@ -9,15 +9,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${SITE_URL}/blog/${post.slug}`,
         lastModified: new Date(post.date),
         changeFrequency: 'weekly' as const,
-        priority: 0.8,
+        priority: 0.85,
     }));
 
-    const staticPages = [
+    const staticPages: MetadataRoute.Sitemap = [
         {
             url: SITE_URL,
             lastModified: new Date(),
-            changeFrequency: 'daily' as const,
+            changeFrequency: 'daily',
             priority: 1.0,
+        },
+        {
+            url: `${SITE_URL}/blog`,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 0.95,
+        },
+        {
+            url: `${SITE_URL}/services`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.9,
+        },
+        {
+            url: `${SITE_URL}/llms.txt`,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 0.8,
+        },
+        {
+            url: `${SITE_URL}/llms-full.txt`,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 0.75,
         },
     ];
 

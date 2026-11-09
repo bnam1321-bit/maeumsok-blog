@@ -9,10 +9,26 @@ export default function robots(): MetadataRoute.Robots {
                 allow: '/',
             },
             {
-                userAgent: ['GPTBot', 'ClaudeBot', 'Google-Extended'],
-                allow: '/',
-            }
+                userAgent: [
+                    'GPTBot',
+                    'OAI-SearchBot',
+                    'ChatGPT-User',
+                    'ClaudeBot',
+                    'Claude-Web',
+                    'anthropic-ai',
+                    'Google-Extended',
+                    'Googlebot',
+                    'PerplexityBot',
+                    'Applebot-Extended',
+                    'Yeti',
+                    'Bingbot',
+                    'Meta-ExternalAgent',
+                    'Amazonbot',
+                ],
+                allow: ['/', '/llms.txt', '/llms-full.txt', '/blog', '/services'],
+            },
         ],
         sitemap: `${SITE_URL}/sitemap.xml`,
+        host: SITE_URL,
     };
 }

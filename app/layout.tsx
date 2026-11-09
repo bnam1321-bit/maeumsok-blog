@@ -3,46 +3,9 @@ import "./globals.css";
 import Header from "./components/Header";
 import FloatingBar from "./components/FloatingBar";
 import Footer from "./components/Footer";
+import { getRootGraphJsonLd } from "@/lib/schema";
 
-// 구조화 데이터 (Schema.org JSON-LD)
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "MedicalClinic",
-  "name": "마음속내과의원",
-  "alternateName": "마음속내과",
-  "slogan": "가족을 진료하는 마음으로 항상 최선을 다하겠습니다.",
-  "image": "https://maeumsok-blog.vercel.app/images/logo.png",
-  "url": "https://maeumsok-blog.vercel.app",
-  "telephone": "032-541-6767",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "인천광역시 계양구 장제로 871 위너빌딩 3층",
-    "addressLocality": "계양구",
-    "addressRegion": "인천광역시",
-    "postalCode": "21060",
-    "addressCountry": "KR"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 37.537,
-    "longitude": 126.737
-  },
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "08:30",
-      "closes": "19:00"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Saturday",
-      "opens": "08:30",
-      "closes": "14:00"
-    }
-  ],
-  "medicalSpecialty": ["InternalMedicine", "Gastroenterology"]
-};
+const rootGraphJsonLd = getRootGraphJsonLd();
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://maeumsok-blog.vercel.app"),
@@ -57,6 +20,8 @@ export const metadata: Metadata = {
     "계양구내과",
     "계양동내과",
     "임학역내과",
+    "작전동내과",
+    "계산동내과",
     "마음속내과",
     "마음속내과의원",
     "계양구 위내시경",
@@ -64,6 +29,20 @@ export const metadata: Metadata = {
     "계양구 건강검진",
     "소화기내시경전문의",
   ],
+  alternates: {
+    canonical: "https://maeumsok-blog.vercel.app",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "마음속내과의원 | 가족을 진료하는 마음으로",
     description:
@@ -97,11 +76,23 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@500;600;700&display=swap"
           rel="stylesheet"
         />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms.txt"
+          title="마음속내과의원 LLM 구조화 요약 (llms.txt)"
+        />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms-full.txt"
+          title="마음속내과의원 전체 의학칼럼 지식베이스 (llms-full.txt)"
+        />
       </head>
       <body className="font-sans antialiased bg-[#FAF8F5] text-stone-900 selection:bg-[#0B3B46] selection:text-white flex flex-col min-h-screen">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootGraphJsonLd) }}
         />
         <Header />
         <main className="flex-1">{children}</main>

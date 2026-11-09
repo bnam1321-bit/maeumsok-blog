@@ -122,7 +122,12 @@ export default function Footer() {
 
                 <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
                     <p>&copy; {new Date().getFullYear()} 마음속내과의원 (MAEUMSOK INTERNAL MEDICINE CLINIC). All rights reserved.</p>
-                    <p>인천광역시 계양구 장제로 871 위너빌딩 3층 · TEL. 032-541-6767</p>
+                    <div className="flex items-center gap-4">
+                        <p>인천광역시 계양구 장제로 871 위너빌딩 3층 · TEL. 032-541-6767</p>
+                        <a href="/llms.txt" className="text-stone-600 hover:text-stone-400 transition-colors" title="AI & LLM Structured Knowledge Index">
+                            LLMs.txt
+                        </a>
+                    </div>
                 </div>
             </div>
         </footer>

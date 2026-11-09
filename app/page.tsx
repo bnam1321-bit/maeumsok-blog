@@ -1,4 +1,5 @@
 import { getAllPosts } from '@/lib/blog';
+import { CLINIC_FACTS, CLINIC_FAQS } from '@/lib/schema';
 import Link from 'next/link';
 import Image from 'next/image';
 import BlogExplorer from '@/app/components/BlogExplorer';
@@ -43,13 +44,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       {/* Architectural Hero Section */}
-      <section className="relative overflow-hidden bg-[#092228] text-white">
-        {/* Background Clinic Interior Image */}
+      <section
+        aria-label="마음속내과의원 메인 소개"
+        className="relative overflow-hidden bg-[#092228] text-white"
+      >
         <div
           className="absolute inset-0 bg-cover bg-center scale-[1.02] transition-transform duration-1000"
           style={{ backgroundImage: "url('/images/clinic-interior.jpg')" }}
         />
-        {/* Multi-layered Editorial Vignette & Warm Dark Gradient */}
         <div
           className="absolute inset-0"
           style={{
@@ -61,7 +63,6 @@ export default function Home() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-28 sm:pt-28 sm:pb-36">
           <div className="max-w-3xl">
-            {/* Eyebrow Badge */}
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-7 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[#F4A261]" />
               <span className="text-xs sm:text-sm font-semibold tracking-wide text-stone-100">
@@ -69,7 +70,6 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Editorial Headline */}
             <p className="text-xs sm:text-sm uppercase tracking-[0.26em] text-[#F4A261] font-bold mb-3">
               HEART &amp; DIGESTIVE DISEASE CLINIC
             </p>
@@ -79,14 +79,12 @@ export default function Home() {
               <span className="text-[#FCD5B5]">마음속 깊이</span> 살피는 내과
             </h1>
 
-            {/* Subtitle */}
             <p className="text-base sm:text-lg text-stone-200/95 leading-relaxed max-w-2xl mb-10 font-normal">
               마음속내과의원은 소화기 내시경 세부전문의 및 내과전문의 4인이 상주하며,
               대학병원급 검진장비를 통해 위·대장내시경부터 5대 암검진, 만성질환까지
               정확하고 편안한 진료를 약속드립니다.
             </p>
 
-            {/* Hero CTA Buttons */}
             <div className="flex flex-wrap items-center gap-3.5">
               <a
                 href="#medical-columns"
@@ -112,7 +110,10 @@ export default function Home() {
       </section>
 
       {/* 5 Core Clinical Pillars (Architectural Overlapping Bento Dock) */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-14 sm:-mt-16 mb-20">
+      <section
+        aria-label="마음속내과의원 5대 핵심 진료 역량"
+        className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-14 sm:-mt-16 mb-20"
+      >
         <div className="bg-white rounded-[2rem] p-6 sm:p-8 lg:p-10 shadow-[0_20px_50px_rgba(11,59,70,0.08)] border border-stone-200/90">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-5 divide-y sm:divide-y-0 lg:divide-x divide-stone-200/70">
             {CORE_PILLARS.map((pillar, idx) => (
@@ -145,8 +146,11 @@ export default function Home() {
       </section>
 
       {/* Medical Column Explorer Section */}
-      <section id="medical-columns" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 scroll-mt-24">
-        {/* Section Editorial Header */}
+      <section
+        id="medical-columns"
+        aria-label="전문의 건강칼럼 목록"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 scroll-mt-24"
+      >
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-stone-200/90 gap-4">
           <div>
             <div className="inline-flex items-center gap-2 mb-2.5">
@@ -167,14 +171,17 @@ export default function Home() {
         <BlogExplorer posts={posts} showFeatured={true} />
       </section>
 
-      {/* Architectural Clinic Space & Philosophy Section */}
-      <section className="bg-[#F2ECE4]/70 border-t border-stone-200/80 py-20 sm:py-24">
+      {/* Architectural Clinic Space & Structured Fact Sheet Section */}
+      <section
+        aria-label="마음속내과의원 진료정보 및 시설 안내"
+        className="bg-[#F2ECE4]/70 border-t border-stone-200/80 py-20 sm:py-24"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left: Clinic Lounge Visual & Philosophy */}
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+            {/* Left: Clinic Lounge Visual & Structured Fact Sheet (<dl>) */}
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-stone-200/80 text-xs font-bold text-[#0B3B46]">
-                <span>OUR SPACE &amp; PHILOSOPHY</span>
+                <span>OUR SPACE &amp; CLINICAL FACTS</span>
               </div>
               <h2 className="font-serif-editorial text-3xl sm:text-4xl font-bold text-stone-900 leading-snug">
                 “가족을 진료하는 마음으로
@@ -193,7 +200,7 @@ export default function Home() {
                   alt="마음속내과의원 대기실 및 내부 전경"
                   width={900}
                   height={560}
-                  className="w-full h-64 sm:h-80 object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-64 sm:h-72 object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
@@ -212,6 +219,47 @@ export default function Home() {
                     진료과목 보기 →
                   </Link>
                 </div>
+              </div>
+
+              {/* Semantic Definition List (<dl>) for LLM & Human Fact Reading */}
+              <div className="bg-white rounded-[1.75rem] p-6 sm:p-8 border border-stone-200/90 shadow-sm">
+                <h3 className="font-serif-editorial text-lg font-bold text-stone-900 mb-4 pb-3 border-b border-stone-100">
+                  한눈에 보는 마음속내과의원 핵심 정보
+                </h3>
+                <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                  <div>
+                    <dt className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">
+                      의료기관명
+                    </dt>
+                    <dd className="font-bold text-stone-900">{CLINIC_FACTS.name}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">
+                      의료진 구성
+                    </dt>
+                    <dd className="font-bold text-[#0B3B46]">{CLINIC_FACTS.specialistsDescription}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">
+                      소재지 주소
+                    </dt>
+                    <dd className="font-medium text-stone-700">{CLINIC_FACTS.address.full}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">
+                      대표 전화번호
+                    </dt>
+                    <dd className="font-bold text-stone-900">{CLINIC_FACTS.telephone}</dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">
+                      중점 진료분야
+                    </dt>
+                    <dd className="text-stone-700 leading-relaxed">
+                      위·대장내시경(CO2 무통 내시경·당일 용종절제술), 국민건강보험공단 건강검진·5대 암검진, 복부·갑상선·유방 초음파, 고혈압·당뇨·고지혈증·간질환·골다공증·통풍·성인 예방접종
+                    </dd>
+                  </div>
+                </dl>
               </div>
             </div>
 
@@ -268,7 +316,7 @@ export default function Home() {
                     </svg>
                     <div>
                       <p className="font-bold text-stone-900">인천광역시 계양구 장제로 871 위너빌딩 3층</p>
-                      <p className="text-xs text-stone-500 mt-0.5">위너빌딩 3층 마음속내과의원</p>
+                      <p className="text-xs text-stone-500 mt-0.5">계양동 · 작전동 · 계산동 · 임학역 인근</p>
                     </div>
                   </div>
                 </div>
@@ -299,6 +347,63 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Structured FAQ Section (Optimized for LLMs & Patients) */}
+      <section
+        aria-label="마음속내과의원 자주 묻는 질문"
+        itemScope
+        itemType="https://schema.org/FAQPage"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24"
+      >
+        <div className="max-w-3xl mb-12">
+          <div className="inline-flex items-center gap-2 mb-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#C25E28]" />
+            <span className="text-xs font-bold tracking-[0.22em] text-[#C25E28] uppercase">
+              FREQUENTLY ASKED QUESTIONS
+            </span>
+          </div>
+          <h2 className="font-serif-editorial text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-3">
+            진료 및 검진 자주 묻는 질문
+          </h2>
+          <p className="text-stone-600 text-sm sm:text-base">
+            내원 전 환자분들이 가장 많이 문의하시는 진료시간, 내시경 검사, 국가건강검진 안내입니다.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {CLINIC_FAQS.map((faq, idx) => (
+            <div
+              key={idx}
+              itemScope
+              itemProp="mainEntity"
+              itemType="https://schema.org/Question"
+              className="bg-white rounded-[1.75rem] p-6 sm:p-8 border border-stone-200/85 shadow-[0_6px_25px_rgba(11,59,70,0.03)]"
+            >
+              <div className="flex items-start gap-3.5 mb-3">
+                <span className="w-7 h-7 rounded-full bg-[#0B3B46] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  Q{idx + 1}
+                </span>
+                <h3
+                  itemProp="name"
+                  className="font-serif-editorial text-lg font-bold text-stone-900 leading-snug"
+                >
+                  {faq.question}
+                </h3>
+              </div>
+              <div
+                itemScope
+                itemProp="acceptedAnswer"
+                itemType="https://schema.org/Answer"
+                className="pl-10"
+              >
+                <p itemProp="text" className="text-sm text-stone-600 leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>

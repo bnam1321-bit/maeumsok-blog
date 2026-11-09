@@ -1,9 +1,14 @@
 import Image from 'next/image';
+import { getClinicEntityJsonLd, CLINIC_FAQS } from '@/lib/schema';
+import { SITE_URL } from '@/lib/constants';
 
 export const metadata = {
     title: '진료안내 · 검진센터 | 마음속내과의원',
     description:
         '인천 계양구 마음속내과의원 진료안내. 소화기 내시경 세부전문의 위·대장내시경, 공단 건강검진·5대암검진, 만성질환, 간·갑상선·유방 초음파 클리닉.',
+    alternates: {
+        canonical: `${SITE_URL}/services`,
+    },
 };
 
 const CLINIC_CENTERS = [
@@ -118,8 +123,56 @@ const CLINIC_CENTERS = [
 ];
 
 export default function ServicesPage() {
+    const servicesJsonLd = {
+        '@context': 'https://schema.org',
+        '@graph': [
+            getClinicEntityJsonLd(),
+            {
+                '@type': 'MedicalWebPage',
+                '@id': `${SITE_URL}/services#webpage`,
+                url: `${SITE_URL}/services`,
+                name: '마음속내과의원 진료안내 및 6대 전문 클리닉 센터',
+                description:
+                    '위·대장내시경 클리닉, 국가건강검진·5대암검진 센터, 만성질환 클리닉, 간·복부초음파 클리닉, 갑상선·유방 클리닉, 호흡기·성인예방접종 클리닉 안내.',
+                inLanguage: 'ko-KR',
+                about: {
+                    '@id': `${SITE_URL}/#clinic`,
+                },
+                mainEntity: {
+                    '@type': 'ItemList',
+                    itemListElement: CLINIC_CENTERS.map((c, idx) => ({
+                        '@type': 'ListItem',
+                        position: idx + 1,
+                        item: {
+                            '@type': 'MedicalSpecialty',
+                            name: c.title,
+                            description: `${c.description} (${c.highlights.join(', ')})`,
+                        },
+                    })),
+                },
+            },
+            {
+                '@type': 'FAQPage',
+                '@id': `${SITE_URL}/services#faq`,
+                mainEntity: CLINIC_FAQS.map((faq) => ({
+                    '@type': 'Question',
+                    name: faq.question,
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: faq.answer,
+                    },
+                })),
+            },
+        ],
+    };
+
     return (
         <div className="min-h-screen bg-[#FAF8F5]">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
+            />
+
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-[#0B3B46] text-white">
                 <div
@@ -157,10 +210,10 @@ export default function ServicesPage() {
             </section>
 
             {/* 6 Specialized Centers Grid */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <section aria-label="6대 전문 진료 클리닉" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
                 <div className="grid md:grid-cols-2 gap-8">
                     {CLINIC_CENTERS.map((center) => (
-                        <div
+                        <article
                             key={center.code}
                             className="bg-white rounded-[2rem] p-8 sm:p-10 border border-stone-200/90 shadow-[0_8px_30px_rgba(11,59,70,0.04)] editorial-card flex flex-col justify-between"
                         >
@@ -200,13 +253,13 @@ export default function ServicesPage() {
                                     ))}
                                 </ul>
                             </div>
-                        </div>
+                        </article>
                     ))}
                 </div>
             </section>
 
             {/* Clinic Interior & Hours Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+            <section aria-label="진료시간 및 위치 안내" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
                 <div className="bg-white rounded-[2.25rem] overflow-hidden border border-stone-200/90 shadow-[0_16px_50px_rgba(11,59,70,0.06)] grid lg:grid-cols-12">
                     {/* Left Photo */}
                     <div className="lg:col-span-6 relative min-h-[300px] sm:min-h-[380px]">

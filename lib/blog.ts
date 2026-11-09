@@ -4,6 +4,16 @@ import matter from 'gray-matter';
 
 const postsDirectory = path.join(process.cwd(), 'content/posts');
 
+export type PostFAQ = {
+    question: string;
+    answer: string;
+};
+
+export type PostHeading = {
+    level: number;
+    text: string;
+};
+
 export type Post = {
     slug: string;
     title: string;
@@ -13,6 +23,8 @@ export type Post = {
     topicTags: string[];
     primaryTopic: string;
     readingTime: number;
+    faqs: PostFAQ[];
+    headings: PostHeading[];
     content: string;
     coverImage?: string;
 };
@@ -39,7 +51,6 @@ export function extractTopicTags(tags: string[] = [], title = ''): string[] {
         return filtered;
     }
 
-    // Fallback: infer from title if all tags were generic location tags
     if (title.includes('내시경')) return ['위·대장내시경'];
     if (title.includes('갑상선')) return ['갑상선클리닉'];
     if (title.includes('간') || title.includes('지방간')) return ['간질환클리닉'];
@@ -51,6 +62,86 @@ export function extractTopicTags(tags: string[] = [], title = ''): string[] {
 function estimateReadingMinutes(content: string): number {
     const charCount = content.replace(/\s+/g, '').length;
     return Math.max(2, Math.round(charCount / 750));
+}
+
+export function extractFAQsFromMarkdown(content: string): PostFAQ[] {
+    const faqs: PostFAQ[] = [];
+    const lines = content.split(/\r?\n/);
+
+    let currentQuestion: string | null = null;
+    let currentAnswerLines: string[] = [];
+
+    const flush = () => {
+        if (currentQuestion && currentAnswerLines.length > 0) {
+            const answer = currentAnswerLines
+                .join(' ')
+                .replace(/^\*\*A\d*[:.]?\*\*\s*/i, '')
+                .replace(/^A\d*[:.]\s*/i, '')
+                .replace(/\*\*/g, '')
+                .trim();
+            if (answer.length > 10) {
+                faqs.push({
+                    question: currentQuestion,
+                    answer,
+                });
+            }
+        }
+        currentQuestion = null;
+        currentAnswerLines = [];
+    };
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim();
+
+        // Stop if a new section starts after Q&A
+        if (/^#{2,3}\s+/.test(line) && !/Q\d*[:.]/i.test(line)) {
+            flush();
+            continue;
+        }
+        if (/^---+$/.test(line) || /^>/.test(line)) {
+            flush();
+            continue;
+        }
+
+        // Match Q1:, **Q1: ...**, **Q. ...**
+        const qMatch = line.match(/^(?:[-*]\s*)?(?:\*\*|#{2,4}\s*)?Q\d*[:.]\s*(.+?)(?:\*\*)?$/i);
+        if (qMatch) {
+            flush();
+            currentQuestion = qMatch[1].replace(/\*\*/g, '').trim();
+            continue;
+        }
+
+        // Match A:, A1:, **A:**
+        const aMatch = line.match(/^(?:[-*]\s*)?(?:\*\*)?A\d*[:.]\s*(.+)$/i);
+        if (aMatch && currentQuestion) {
+            currentAnswerLines.push(aMatch[1].replace(/^\*\*\s*/, '').trim());
+            continue;
+        }
+
+        if (currentQuestion && line.length > 0 && currentAnswerLines.length > 0) {
+            currentAnswerLines.push(line);
+        }
+    }
+
+    flush();
+    return faqs;
+}
+
+export function extractHeadingsFromMarkdown(content: string): PostHeading[] {
+    const headings: PostHeading[] = [];
+    const lines = content.split(/\r?\n/);
+
+    for (const rawLine of lines) {
+        const match = rawLine.trim().match(/^(#{2,3})\s+(.+)$/);
+        if (match) {
+            headings.push({
+                level: match[1].length,
+                text: match[2].replace(/\*\*/g, '').trim(),
+            });
+        }
+    }
+
+    return headings;
 }
 
 export function getAllPosts(): Post[] {
@@ -85,6 +176,8 @@ export function getAllPosts(): Post[] {
                 topicTags,
                 primaryTopic: topicTags[0] || '전문의 칼럼',
                 readingTime: estimateReadingMinutes(content),
+                faqs: extractFAQsFromMarkdown(content),
+                headings: extractHeadingsFromMarkdown(content),
                 ...data,
             } as Post;
         })
@@ -117,6 +210,8 @@ export function getPostBySlug(slug: string): Post | null {
             topicTags,
             primaryTopic: topicTags[0] || '전문의 칼럼',
             readingTime: estimateReadingMinutes(content),
+            faqs: extractFAQsFromMarkdown(content),
+            headings: extractHeadingsFromMarkdown(content),
             ...data,
         } as Post;
     } catch (_err) {

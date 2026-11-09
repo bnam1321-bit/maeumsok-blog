@@ -1,4 +1,5 @@
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
+import { getClinicEntityJsonLd, CLINIC_FACTS } from '@/lib/schema';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import { Metadata } from 'next';
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         keywords: [
             ...(post.tags || []),
             CLINIC_NAME,
+            '마음속내과의원',
             '계양구내과',
             '인천계양내과',
             '계양동내과',
@@ -51,8 +53,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             type: 'article',
             publishedTime: post.date,
             url: `${SITE_URL}/blog/${post.slug}`,
-            siteName: CLINIC_NAME,
-            authors: [CLINIC_NAME],
+            siteName: '마음속내과의원',
+            authors: ['마음속내과의원 내과전문의 4인'],
             images: [
                 {
                     url: post.coverImage || '/images/clinic-interior.jpg',
@@ -75,23 +77,84 @@ export default async function BlogPostPage({ params }: Props) {
 
     const allPosts = getAllPosts();
     const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
+    const articleUrl = `${SITE_URL}/blog/${post.slug}`;
+
+    // Multi-entity @graph JSON-LD (MedicalWebPage + BlogPosting + BreadcrumbList + Automatic FAQPage)
+    const graphEntities: Record<string, unknown>[] = [
+        getClinicEntityJsonLd(),
+        {
+            '@type': ['MedicalWebPage', 'BlogPosting'],
+            '@id': `${articleUrl}#article`,
+            mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id': articleUrl,
+            },
+            headline: post.title,
+            name: post.title,
+            description: post.description,
+            datePublished: post.date,
+            dateModified: post.date,
+            inLanguage: 'ko-KR',
+            articleSection: post.primaryTopic,
+            keywords: (post.tags || []).join(', '),
+            author: {
+                '@id': `${SITE_URL}/#clinic`,
+            },
+            reviewedBy: {
+                '@id': `${SITE_URL}/#clinic`,
+            },
+            publisher: {
+                '@id': `${SITE_URL}/#clinic`,
+            },
+            about: post.topicTags.map((tag) => ({
+                '@type': 'MedicalCondition',
+                name: tag,
+            })),
+        },
+        {
+            '@type': 'BreadcrumbList',
+            '@id': `${articleUrl}#breadcrumb`,
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: '마음속내과의원 홈',
+                    item: SITE_URL,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: '전문의 건강칼럼',
+                    item: `${SITE_URL}/blog`,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 3,
+                    name: post.title,
+                    item: articleUrl,
+                },
+            ],
+        },
+    ];
+
+    if (post.faqs && post.faqs.length > 0) {
+        graphEntities.push({
+            '@type': 'FAQPage',
+            '@id': `${articleUrl}#faq`,
+            mainEntity: post.faqs.map((faq) => ({
+                '@type': 'Question',
+                name: faq.question,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: faq.answer,
+                },
+            })),
+        });
+    }
 
     const jsonLd = {
         '@context': 'https://schema.org',
-        '@type': 'MedicalWebPage',
-        headline: post.title,
-        description: post.description,
-        datePublished: post.date,
-        author: {
-            '@type': 'MedicalClinic',
-            name: '마음속내과의원',
-            url: SITE_URL,
-        },
-        publisher: {
-            '@type': 'MedicalClinic',
-            name: '마음속내과의원',
-            telephone: '032-541-6767',
-        },
+        '@graph': graphEntities,
     };
 
     return (
@@ -102,27 +165,42 @@ export default async function BlogPostPage({ params }: Props) {
             />
 
             {/* Top Breadcrumb Bar */}
-            <div className="bg-white/80 backdrop-blur-md border-b border-stone-200/80">
+            <nav
+                aria-label="현재 위치 경로"
+                className="bg-white/80 backdrop-blur-md border-b border-stone-200/80"
+            >
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between text-xs sm:text-sm">
-                    <Link
-                        href="/blog"
-                        className="inline-flex items-center gap-2 font-semibold text-stone-600 hover:text-[#0B3B46] transition-colors"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span>건강칼럼 목록으로</span>
-                    </Link>
+                    <ol className="flex items-center gap-2 text-stone-500 truncate">
+                        <li>
+                            <Link href="/" className="hover:text-[#0B3B46] transition-colors font-medium">
+                                홈
+                            </Link>
+                        </li>
+                        <li className="text-stone-300">/</li>
+                        <li>
+                            <Link href="/blog" className="hover:text-[#0B3B46] transition-colors font-semibold text-stone-700">
+                                전문의 건강칼럼
+                            </Link>
+                        </li>
+                        <li className="text-stone-300 hidden sm:inline">/</li>
+                        <li className="text-[#0B3B46] font-semibold hidden sm:inline truncate">
+                            {post.primaryTopic}
+                        </li>
+                    </ol>
 
-                    <div className="hidden sm:flex items-center gap-2 text-stone-400 text-xs">
+                    <div className="hidden sm:flex items-center gap-2 text-stone-400 text-xs shrink-0">
                         <span>마음속내과의원</span>
                         <span>·</span>
                         <span className="text-[#0B3B46] font-semibold">내과전문의 4인 감수</span>
                     </div>
                 </div>
-            </div>
+            </nav>
 
-            <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <article
+                itemScope
+                itemType="https://schema.org/MedicalWebPage"
+                className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16"
+            >
                 {/* Editorial Article Header */}
                 <header className="mb-10 sm:mb-12">
                     <div className="flex flex-wrap items-center gap-2.5 mb-6">
@@ -132,7 +210,11 @@ export default async function BlogPostPage({ params }: Props) {
                         <span className="px-3.5 py-1.5 bg-[#EBF3F5] text-[#0B3B46] rounded-full text-xs font-semibold">
                             전문의 의학칼럼
                         </span>
-                        <time className="text-stone-500 text-xs sm:text-sm font-medium flex items-center gap-1.5 ml-1">
+                        <time
+                            itemProp="datePublished"
+                            dateTime={post.date}
+                            className="text-stone-500 text-xs sm:text-sm font-medium flex items-center gap-1.5 ml-1"
+                        >
                             <svg className="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -144,24 +226,68 @@ export default async function BlogPostPage({ params }: Props) {
                         </span>
                     </div>
 
-                    <h1 className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.65rem] font-bold text-stone-900 leading-[1.28] tracking-tight mb-7">
+                    <h1
+                        itemProp="headline"
+                        className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.65rem] font-bold text-stone-900 leading-[1.28] tracking-tight mb-7"
+                    >
                         {post.title}
                     </h1>
 
-                    {post.description && (
-                        <div className="p-6 sm:p-7 rounded-2xl bg-white border border-stone-200/90 border-l-4 border-l-[#C25E28] shadow-sm">
-                            <p className="text-xs font-bold tracking-widest uppercase text-[#C25E28] mb-1.5">
-                                CLINICAL SUMMARY · 핵심 요약
-                            </p>
-                            <p className="text-base sm:text-lg text-stone-700 leading-relaxed font-medium">
-                                {post.description}
-                            </p>
-                        </div>
-                    )}
+                    {/* Clinical Summary & Structured Metadata Box */}
+                    <div className="p-6 sm:p-8 rounded-3xl bg-white border border-stone-200/90 border-l-4 border-l-[#C25E28] shadow-sm space-y-5">
+                        {post.description && (
+                            <div>
+                                <p className="text-xs font-bold tracking-widest uppercase text-[#C25E28] mb-1.5">
+                                    CLINICAL SUMMARY · 핵심 의학 요약
+                                </p>
+                                <p
+                                    itemProp="description"
+                                    className="text-base sm:text-lg text-stone-800 leading-relaxed font-medium"
+                                >
+                                    {post.description}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Structured Metadata Definition List for LLM & Patient Trust */}
+                        <dl className="grid sm:grid-cols-3 gap-3 pt-4 border-t border-stone-100 text-xs">
+                            <div>
+                                <dt className="text-stone-400 font-semibold mb-0.5">감수 의료기관</dt>
+                                <dd className="font-bold text-stone-800">{CLINIC_FACTS.name} (인천 계양구)</dd>
+                            </div>
+                            <div>
+                                <dt className="text-stone-400 font-semibold mb-0.5">담당 전문의</dt>
+                                <dd className="font-bold text-[#0B3B46]">{CLINIC_FACTS.specialistsDescription}</dd>
+                            </div>
+                            <div>
+                                <dt className="text-stone-400 font-semibold mb-0.5">관련 진료센터</dt>
+                                <dd className="font-bold text-stone-800">{post.primaryTopic} · 내과 검진센터</dd>
+                            </div>
+                        </dl>
+
+                        {/* Automatic Table of Contents (칼럼 목차) */}
+                        {post.headings && post.headings.length > 0 && (
+                            <nav aria-label="칼럼 주요 목차" className="pt-4 border-t border-stone-100">
+                                <p className="text-xs font-bold tracking-wider uppercase text-stone-400 mb-2.5">
+                                    ARTICLE OUTLINE · 칼럼 주요 내용
+                                </p>
+                                <ol className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs sm:text-sm text-stone-600 list-decimal list-inside">
+                                    {post.headings.map((h, i) => (
+                                        <li key={i} className="truncate font-medium">
+                                            {h.text}
+                                        </li>
+                                    ))}
+                                </ol>
+                            </nav>
+                        )}
+                    </div>
                 </header>
 
                 {/* Main Article Content Sheet */}
-                <div className="bg-white rounded-[2rem] shadow-[0_12px_45px_rgba(11,59,70,0.05)] border border-stone-200/90 p-6 sm:p-12 lg:p-14 mb-10">
+                <div
+                    itemProp="mainContentOfPage"
+                    className="bg-white rounded-[2rem] shadow-[0_12px_45px_rgba(11,59,70,0.05)] border border-stone-200/90 p-6 sm:p-12 lg:p-14 mb-10"
+                >
                     <div className="editorial-prose max-w-none">
                         <ReactMarkdown>{post.content}</ReactMarkdown>
                     </div>
@@ -170,7 +296,7 @@ export default async function BlogPostPage({ params }: Props) {
                     {post.tags && post.tags.length > 0 && (
                         <div className="mt-12 pt-8 border-t border-stone-200/80">
                             <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">
-                                RELATED KEYWORDS
+                                RELATED MEDICAL KEYWORDS
                             </p>
                             <div className="flex flex-wrap gap-2">
                                 {post.tags.map((tag, index) => (
@@ -187,7 +313,10 @@ export default async function BlogPostPage({ params }: Props) {
                 </div>
 
                 {/* Specialist Signature & Clinic Consultation Card */}
-                <div className="bg-[#0B3B46] text-white rounded-[2rem] p-7 sm:p-10 mb-14 shadow-xl relative overflow-hidden">
+                <aside
+                    aria-label="마음속내과의원 진료 및 상담 안내"
+                    className="bg-[#0B3B46] text-white rounded-[2rem] p-7 sm:p-10 mb-14 shadow-xl relative overflow-hidden"
+                >
                     <div className="absolute inset-0 bg-architectural-grid-light opacity-40 pointer-events-none" />
                     <div className="relative z-10">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-white/15">
@@ -222,21 +351,27 @@ export default async function BlogPostPage({ params }: Props) {
                             증상이 지속되거나 정밀 검진이 필요한 경우 내원하시어 전문의와 상의하시기 바랍니다.
                         </p>
 
-                        <div className="grid sm:grid-cols-2 gap-3.5 p-4 rounded-2xl bg-white/10 border border-white/15 text-xs sm:text-sm text-stone-100 mb-6">
+                        <dl className="grid sm:grid-cols-2 gap-3.5 p-4 rounded-2xl bg-white/10 border border-white/15 text-xs sm:text-sm text-stone-100 mb-6">
                             <div className="flex items-center gap-2.5">
                                 <svg className="w-4 h-4 text-[#F4A261] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span>인천광역시 계양구 장제로 871 위너빌딩 3층</span>
+                                <div>
+                                    <dt className="sr-only">주소</dt>
+                                    <dd>인천광역시 계양구 장제로 871 위너빌딩 3층</dd>
+                                </div>
                             </div>
                             <div className="flex items-center gap-2.5">
                                 <svg className="w-4 h-4 text-[#F4A261] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span>평일 08:30–19:00 · 토요일 08:30–14:00 (노런치)</span>
+                                <div>
+                                    <dt className="sr-only">진료시간</dt>
+                                    <dd>평일 08:30–19:00 · 토요일 08:30–14:00 (노런치)</dd>
+                                </div>
                             </div>
-                        </div>
+                        </dl>
 
                         <div className="flex flex-wrap items-center justify-between gap-4">
                             <div className="flex flex-wrap items-center gap-3">
@@ -267,11 +402,11 @@ export default async function BlogPostPage({ params }: Props) {
                             </a>
                         </div>
                     </div>
-                </div>
+                </aside>
 
                 {/* Related Columns */}
                 {relatedPosts.length > 0 && (
-                    <section className="pt-6 border-t border-stone-200/90">
+                    <section aria-label="관련 건강칼럼 추천" className="pt-6 border-t border-stone-200/90">
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <p className="text-xs font-bold tracking-widest uppercase text-[#C25E28] mb-1">
