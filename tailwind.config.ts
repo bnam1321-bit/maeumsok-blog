@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
 
 const config: Config = {
     content: [
@@ -7,8 +8,25 @@ const config: Config = {
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: ["var(--font-noto)", "Noto Sans KR", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
+                serif: ["var(--font-serif)", "Noto Serif KR", "Georgia", "serif"],
+            },
+            colors: {
+                clinic: {
+                    teal: "#0B3B46",
+                    tealLight: "#135666",
+                    tealSoft: "#EBF3F5",
+                    bronze: "#C25E28",
+                    bronzeLight: "#FDF4EE",
+                    ivory: "#FAF8F5",
+                    sand: "#F2ECE4",
+                    charcoal: "#18181B",
+                },
+            },
+        },
     },
-    plugins: [],
+    plugins: [typography],
 };
 export default config;
