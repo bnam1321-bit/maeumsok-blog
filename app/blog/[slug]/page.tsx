@@ -228,21 +228,21 @@ export default async function BlogPostPage({ params }: Props) {
 
                     <h1
                         itemProp="headline"
-                        className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.65rem] font-bold text-stone-900 leading-[1.28] tracking-tight mb-7"
+                        className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.55rem] font-bold text-[#191918] leading-[1.48] tracking-[-0.018em] mb-8"
                     >
                         {post.title}
                     </h1>
 
                     {/* Clinical Summary & Structured Metadata Box */}
-                    <div className="p-6 sm:p-8 rounded-3xl bg-white border border-stone-200/90 border-l-4 border-l-[#C25E28] shadow-sm space-y-5">
+                    <div className="p-7 sm:p-9 rounded-3xl bg-white border border-[#E6E2DA] border-l-4 border-l-[#C25E28] shadow-sm space-y-5">
                         {post.description && (
                             <div>
-                                <p className="text-xs font-bold tracking-widest uppercase text-[#C25E28] mb-1.5">
+                                <p className="text-xs font-bold tracking-widest uppercase text-[#C25E28] mb-2">
                                     CLINICAL SUMMARY · 핵심 의학 요약
                                 </p>
                                 <p
                                     itemProp="description"
-                                    className="text-base sm:text-lg text-stone-800 leading-relaxed font-medium"
+                                    className="text-base sm:text-[1.08rem] text-stone-800 leading-[1.88] font-medium"
                                 >
                                     {post.description}
                                 </p>
@@ -424,11 +424,11 @@ export default async function BlogPostPage({ params }: Props) {
                             </Link>
                         </div>
 
-                        <div className="grid sm:grid-cols-3 gap-5">
+                        <div className="grid sm:grid-cols-3 gap-6">
                             {relatedPosts.map((rel) => (
                                 <Link key={rel.slug} href={`/blog/${rel.slug}`} className="group block">
-                                    <div className="h-full bg-white rounded-2xl overflow-hidden border border-stone-200/80 editorial-card flex flex-col">
-                                        <div className="h-36 w-full overflow-hidden">
+                                    <div className="h-full bg-white rounded-2xl overflow-hidden border border-[#E6E2DA] editorial-card flex flex-col">
+                                        <div className="h-40 w-full overflow-hidden">
                                             <TypographicCover
                                                 title={rel.title}
                                                 tags={rel.topicTags}
@@ -436,11 +436,11 @@ export default async function BlogPostPage({ params }: Props) {
                                                 className="transition-transform duration-500 group-hover:scale-105"
                                             />
                                         </div>
-                                        <div className="p-4 flex-1 flex flex-col justify-between">
-                                            <h3 className="font-serif-editorial text-sm font-bold text-stone-900 group-hover:text-[#0B3B46] line-clamp-2 leading-snug mb-2">
+                                        <div className="p-5 flex-1 flex flex-col justify-between">
+                                            <h3 className="font-serif-editorial text-[0.98rem] font-bold text-[#191918] group-hover:text-[#0B3B46] line-clamp-2 leading-[1.58] mb-3">
                                                 {rel.title}
                                             </h3>
-                                            <span className="text-[11px] text-stone-400 font-medium">
+                                            <span className="text-xs text-stone-400 font-medium">
                                                 {rel.date} · {rel.readingTime}분 읽기
                                             </span>
                                         </div>

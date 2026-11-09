@@ -21,17 +21,59 @@ const LOCATION_NOISE = new Set([
     '진료안내',
 ]);
 
-function pickClinicalBadge(tags?: string[], title = ''): string {
-    if (tags && tags.length > 0) {
-        const clean = tags.find((t) => t && !LOCATION_NOISE.has(t.trim()));
-        if (clean) return clean;
+function extractCoverConcept(title: string, tags?: string[]) {
+    const cleanTags = (tags || [])
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0 && !LOCATION_NOISE.has(t));
+
+    const badge = cleanTags[0] || '전문의 칼럼';
+
+    // Smart extraction of a concise 2~4 word Core Medical Subject for the art cover
+    let coreSubject = '';
+    if (title.includes(':')) {
+        const afterColon = title.split(':')[1]?.trim() || '';
+        coreSubject = afterColon.split(',')[0]?.trim() || '';
+    } else if (title.includes('?')) {
+        const afterQuestion = title.split('?')[1]?.trim() || '';
+        coreSubject = afterQuestion
+            .replace(/^(내과 전문의가 알려주는|전문의가 설명하는|원인부터|정확한)\s*/g, '')
+            .trim();
+    } else if (title.includes(',')) {
+        coreSubject = title.split(',')[0]?.trim() || '';
     }
-    if (title.includes('내시경') || title.includes('식도') || title.includes('위') || title.includes('장')) return '소화기·내시경';
-    if (title.includes('갑상선')) return '갑상선클리닉';
-    if (title.includes('간')) return '간질환클리닉';
-    if (title.includes('혈압') || title.includes('당뇨') || title.includes('콜레스테롤') || title.includes('대사')) return '만성질환·대사';
-    if (title.includes('기침') || title.includes('천식') || title.includes('호흡')) return '호흡기·내과';
-    return '전문의 의학칼럼';
+
+    if (!coreSubject || coreSubject.length > 18 || coreSubject.length < 3) {
+        if (cleanTags.length >= 2) {
+            coreSubject = `${cleanTags[0]} · ${cleanTags[1]}`;
+        } else if (cleanTags.length === 1) {
+            coreSubject = `${cleanTags[0]} 집중 분석`;
+        } else {
+            coreSubject = title.slice(0, 14);
+        }
+    }
+
+    // English department classification
+    const text = `${title} ${cleanTags.join(' ')}`;
+    let department = 'INTERNAL MEDICINE INSIGHT';
+    let code = 'IM';
+    if (/내시경|식도|위염|위궤양|대장|장염|과민성|소화|헬리코박터|역류|용종|변비|설사/.test(text)) {
+        department = 'GASTROENTEROLOGY & ENDOSCOPY';
+        code = 'GI';
+    } else if (/갑상선|호르몬|유방/.test(text)) {
+        department = 'THYROID & ENDOCRINE CLINIC';
+        code = 'EN';
+    } else if (/지방간|간염|간기능|간질환|담낭|담석/.test(text)) {
+        department = 'HEPATOLOGY & ULTRASOUND';
+        code = 'HP';
+    } else if (/혈압|당뇨|콜레스테롤|고지혈|대사증후군|통풍|신장|콩팥|골다공증|빈혈|혈당|혈관/.test(text)) {
+        department = 'CARDIOMETABOLIC & CHRONIC CARE';
+        code = 'CM';
+    } else if (/기침|감기|천식|대상포진|어지럼증|이석증|수면|무호흡|비타민/.test(text)) {
+        department = 'RESPIRATORY & PREVENTIVE CARE';
+        code = 'RP';
+    }
+
+    return { badge, coreSubject, department, code };
 }
 
 export default function TypographicCover({
@@ -43,52 +85,52 @@ export default function TypographicCover({
 }: TypographicCoverProps) {
     const themes = [
         {
-            bg: 'linear-gradient(135deg, #0B3B46 0%, #124E5B 55%, #1D353B 100%)',
-            accent: '#E07A3F',
-            badgeBg: 'rgba(224, 122, 63, 0.22)',
-            badgeBorder: 'rgba(244, 162, 97, 0.45)',
-            badgeText: '#FCD5B5',
-            label: 'GASTROENTEROLOGY & INTERNAL MEDICINE',
+            bg: 'linear-gradient(145deg, #092C35 0%, #0F4654 55%, #071F26 100%)',
+            accent: '#E58A4E',
+            pillBg: 'rgba(229, 138, 78, 0.16)',
+            pillBorder: 'rgba(229, 138, 78, 0.38)',
+            pillText: '#FCD9B8',
+            ringColor: 'rgba(229, 138, 78, 0.18)',
         },
         {
-            bg: 'linear-gradient(135deg, #27221F 0%, #3D312A 55%, #1E292B 100%)',
-            accent: '#D97706',
-            badgeBg: 'rgba(217, 119, 6, 0.22)',
-            badgeBorder: 'rgba(251, 191, 36, 0.4)',
-            badgeText: '#FDE68A',
-            label: 'CLINICAL SPECIALIST INSIGHT',
+            bg: 'linear-gradient(145deg, #211D1A 0%, #362C26 55%, #171513 100%)',
+            accent: '#E09F5A',
+            pillBg: 'rgba(224, 159, 90, 0.16)',
+            pillBorder: 'rgba(224, 159, 90, 0.36)',
+            pillText: '#FDE6C4',
+            ringColor: 'rgba(224, 159, 90, 0.16)',
         },
         {
-            bg: 'linear-gradient(135deg, #133A36 0%, #0F4C5C 60%, #09262E 100%)',
-            accent: '#52B788',
-            badgeBg: 'rgba(82, 183, 136, 0.2)',
-            badgeBorder: 'rgba(116, 198, 157, 0.4)',
-            badgeText: '#D8F3DC',
-            label: 'PREVENTIVE CARE & CHECKUP',
+            bg: 'linear-gradient(145deg, #10332E 0%, #194A43 55%, #0A221F 100%)',
+            accent: '#74C69D',
+            pillBg: 'rgba(116, 198, 157, 0.15)',
+            pillBorder: 'rgba(116, 198, 157, 0.35)',
+            pillText: '#D8F3DC',
+            ringColor: 'rgba(116, 198, 157, 0.16)',
         },
         {
-            bg: 'linear-gradient(135deg, #1E293B 0%, #0F3E4D 55%, #111827 100%)',
+            bg: 'linear-gradient(145deg, #172334 0%, #1F364D 55%, #0F1824 100%)',
             accent: '#F4A261',
-            badgeBg: 'rgba(244, 162, 97, 0.2)',
-            badgeBorder: 'rgba(244, 162, 97, 0.4)',
-            badgeText: '#FFEDD5',
-            label: 'MAEUMSOK MEDICAL JOURNAL',
+            pillBg: 'rgba(244, 162, 97, 0.16)',
+            pillBorder: 'rgba(244, 162, 97, 0.36)',
+            pillText: '#FFE8D1',
+            ringColor: 'rgba(244, 162, 97, 0.16)',
         },
         {
-            bg: 'linear-gradient(135deg, #432818 0%, #6F3826 52%, #1D2D35 100%)',
+            bg: 'linear-gradient(145deg, #3A2218 0%, #573122 55%, #23150F 100%)',
             accent: '#F4A261',
-            badgeBg: 'rgba(255, 255, 255, 0.14)',
-            badgeBorder: 'rgba(255, 255, 255, 0.3)',
-            badgeText: '#FFF7ED',
-            label: 'HEART & DIGESTIVE CLINIC',
+            pillBg: 'rgba(255, 255, 255, 0.12)',
+            pillBorder: 'rgba(255, 255, 255, 0.26)',
+            pillText: '#FFF3E6',
+            ringColor: 'rgba(244, 162, 97, 0.18)',
         },
         {
-            bg: 'linear-gradient(135deg, #0D2F38 0%, #1B4332 55%, #0B252C 100%)',
+            bg: 'linear-gradient(145deg, #1E282A 0%, #2C3D40 55%, #141B1D 100%)',
             accent: '#E9C46A',
-            badgeBg: 'rgba(233, 196, 106, 0.18)',
-            badgeBorder: 'rgba(233, 196, 106, 0.4)',
-            badgeText: '#FEF3C7',
-            label: '4 SPECIALISTS COLLABORATIVE CARE',
+            pillBg: 'rgba(233, 196, 106, 0.15)',
+            pillBorder: 'rgba(233, 196, 106, 0.35)',
+            pillText: '#FEF3C7',
+            ringColor: 'rgba(233, 196, 106, 0.15)',
         },
     ];
 
@@ -98,87 +140,87 @@ export default function TypographicCover({
         hash = safeId.charCodeAt(i) + ((hash << 5) - hash);
     }
     const theme = themes[Math.abs(hash) % themes.length];
-    const clinicalBadge = pickClinicalBadge(tags, title);
+    const { badge, coreSubject, department, code } = extractCoverConcept(title, tags);
 
     return (
         <div
             className={`relative w-full h-full overflow-hidden select-none ${className}`}
             style={{ background: theme.bg }}
         >
-            {/* Architectural Fine Grid */}
-            <div className="absolute inset-0 bg-architectural-grid-light opacity-60" />
+            {/* Fine Architectural Grid */}
+            <div className="absolute inset-0 bg-architectural-grid-light opacity-45" />
 
-            {/* Soft Radial Glow */}
+            {/* Ambient Radial Lighting */}
             <div
-                className="absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl opacity-25 pointer-events-none"
+                className="absolute -top-20 -right-16 w-56 h-56 rounded-full blur-3xl opacity-25 pointer-events-none"
                 style={{ backgroundColor: theme.accent }}
             />
-            <div
-                className="absolute -bottom-20 -left-16 w-48 h-48 rounded-full blur-3xl opacity-15 pointer-events-none"
-                style={{ backgroundColor: '#FFFFFF' }}
-            />
 
-            {/* Delicate SVG Medical Seal Watermark */}
+            {/* Minimalist Architectural Concentric Rings */}
             <svg
-                className="absolute -right-6 -bottom-6 w-36 h-36 text-white/[0.045] pointer-events-none transform -rotate-12"
-                viewBox="0 0 100 100"
+                className="absolute -right-10 -bottom-10 w-48 h-48 pointer-events-none"
+                viewBox="0 0 200 200"
                 fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
             >
-                <circle cx="50" cy="50" r="42" strokeDasharray="3 3" />
-                <circle cx="50" cy="50" r="32" />
-                <path d="M50 28v44M28 50h44" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M38 42c4-6 12-6 12 2 0-8 8-8 12-2 4 6-4 14-12 20-8-6-16-14-12-20z" />
+                <circle cx="100" cy="100" r="85" stroke={theme.ringColor} strokeWidth="1" />
+                <circle cx="100" cy="100" r="62" stroke={theme.ringColor} strokeWidth="1" strokeDasharray="3 4" />
+                <circle cx="100" cy="100" r="38" stroke={theme.ringColor} strokeWidth="1" />
+                <line x1="15" y1="100" x2="185" y2="100" stroke={theme.ringColor} strokeWidth="0.75" />
+                <line x1="100" y1="15" x2="100" y2="185" stroke={theme.ringColor} strokeWidth="0.75" />
             </svg>
 
-            {/* Content Container */}
+            {/* Cover Content Layout */}
             <div className="relative h-full flex flex-col justify-between p-6 sm:p-7">
-                {/* Top Row: Topic Pill & Editorial Emblem */}
-                <div className="flex items-center justify-between gap-2">
+                {/* Top Row: Clinical Topic Pill & Series Code */}
+                <div className="flex items-center justify-between gap-3">
                     {showTags ? (
                         <span
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-tight backdrop-blur-md"
+                            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold tracking-normal backdrop-blur-md"
                             style={{
-                                backgroundColor: theme.badgeBg,
-                                border: `1px solid ${theme.badgeBorder}`,
-                                color: theme.badgeText,
+                                backgroundColor: theme.pillBg,
+                                border: `1px solid ${theme.pillBorder}`,
+                                color: theme.pillText,
                             }}
                         >
                             <span
                                 className="w-1.5 h-1.5 rounded-full"
                                 style={{ backgroundColor: theme.accent }}
                             />
-                            {clinicalBadge}
+                            {badge}
                         </span>
                     ) : (
                         <span />
                     )}
 
-                    <span className="text-[10px] font-semibold tracking-[0.16em] text-white/45 uppercase">
-                        MAEUMSOK M.D.
+                    <span className="font-mono text-[10px] font-semibold tracking-[0.2em] text-white/40 uppercase">
+                        SERIES · {code}
                     </span>
                 </div>
 
-                {/* Middle: Editorial Title */}
-                <div className="my-auto py-2">
-                    <p className="text-[10px] font-semibold tracking-[0.18em] text-white/50 uppercase mb-2 truncate">
-                        {theme.label}
+                {/* Center: Core Medical Subject (Spacious, Non-repetitive Editorial Art Title) */}
+                <div className="my-auto py-3">
+                    <p
+                        className="text-[10px] font-bold tracking-[0.2em] uppercase mb-2.5"
+                        style={{ color: theme.accent }}
+                    >
+                        {department}
                     </p>
-                    <h2 className="font-serif-editorial text-xl sm:text-2xl font-bold text-white leading-snug tracking-tight line-clamp-2 drop-shadow-sm">
-                        {title}
-                    </h2>
+                    <div className="font-serif-editorial text-2xl sm:text-[1.65rem] font-bold text-white leading-[1.45] tracking-[-0.015em] line-clamp-2 drop-shadow-sm">
+                        {coreSubject}
+                    </div>
                 </div>
 
-                {/* Bottom: Architectural Accent Rule */}
-                <div className="flex items-center gap-3 pt-1">
-                    <div
-                        className="w-8 h-0.5 rounded-full"
-                        style={{ backgroundColor: theme.accent }}
-                    />
-                    <span className="text-[11px] font-medium text-white/60 tracking-wide">
-                        내과전문의 4인 감수 칼럼
-                    </span>
+                {/* Bottom: Editorial Seal */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div className="flex items-center gap-2.5">
+                        <span
+                            className="w-5 h-0.5 rounded-full"
+                            style={{ backgroundColor: theme.accent }}
+                        />
+                        <span className="text-[11px] font-medium text-white/65 tracking-normal">
+                            마음속내과 전문의 칼럼
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

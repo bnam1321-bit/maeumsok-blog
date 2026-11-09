@@ -70,10 +70,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&display=swap"
           rel="stylesheet"
         />
         <link
@@ -89,7 +96,7 @@ export default function RootLayout({
           title="마음속내과의원 전체 의학칼럼 지식베이스 (llms-full.txt)"
         />
       </head>
-      <body className="font-sans antialiased bg-[#FAF8F5] text-stone-900 selection:bg-[#0B3B46] selection:text-white flex flex-col min-h-screen">
+      <body className="font-sans antialiased bg-[#F7F5F0] text-[#191918] selection:bg-[#0B3B46] selection:text-white flex flex-col min-h-screen">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(rootGraphJsonLd) }}

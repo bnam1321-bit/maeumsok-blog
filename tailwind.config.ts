@@ -10,8 +10,17 @@ const config: Config = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["var(--font-noto)", "Noto Sans KR", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
-                serif: ["var(--font-serif)", "Noto Serif KR", "Georgia", "serif"],
+                sans: [
+                    '"Pretendard Variable"',
+                    "Pretendard",
+                    "-apple-system",
+                    "BlinkMacSystemFont",
+                    "system-ui",
+                    '"Apple SD Gothic Neo"',
+                    '"Noto Sans KR"',
+                    "sans-serif",
+                ],
+                serif: ['"Noto Serif KR"', "Georgia", "serif"],
             },
             colors: {
                 clinic: {
@@ -20,9 +29,9 @@ const config: Config = {
                     tealSoft: "#EBF3F5",
                     bronze: "#C25E28",
                     bronzeLight: "#FDF4EE",
-                    ivory: "#FAF8F5",
-                    sand: "#F2ECE4",
-                    charcoal: "#18181B",
+                    ivory: "#F7F5F0",
+                    sand: "#EFECE6",
+                    charcoal: "#191918",
                 },
             },
         },
