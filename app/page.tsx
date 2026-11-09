@@ -74,11 +74,14 @@ export default function Home() {
                 HEART &amp; DIGESTIVE DISEASE CLINIC
               </p>
 
-              {/* Breathable Korean Headline (leading-[1.42]) */}
-              <h1 className="font-serif-editorial text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-white leading-[1.42] tracking-[-0.02em] mb-7">
-                가족을 진료하는 마음으로,
-                <br />
-                <span className="text-[#FCD5B5]">마음속 깊이</span> 살피는 내과
+              {/* Breathable Korean Headline with Explicit Block Gap */}
+              <h1 className="font-serif-editorial text-3xl sm:text-5xl lg:text-[3.25rem] font-bold text-white tracking-[-0.02em] mb-8">
+                <span className="block leading-[1.45] sm:leading-[1.45] lg:leading-[1.45]">
+                  가족을 진료하는 마음으로,
+                </span>
+                <span className="block mt-2.5 sm:mt-3.5 leading-[1.45] sm:leading-[1.45] lg:leading-[1.45]">
+                  <span className="text-[#FCD5B5]">마음속 깊이</span> 살피는 내과
+                </span>
               </h1>
 
               {/* Breathable Body Copy (leading-[1.92]) */}
@@ -163,7 +166,7 @@ export default function Home() {
                         MAEUMSOK LOUNGE · 3F
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-semibold">
-                        토요일 노런치 진료
+                        토요일 점심시간 없이 진료
                       </span>
                     </div>
                     <p className="font-serif-editorial text-base sm:text-lg font-bold text-white leading-[1.5] mb-1">
@@ -254,10 +257,13 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E6E2DA] text-xs font-bold text-[#0B3B46]">
                 <span>OUR SPACE &amp; CLINICAL FACTS</span>
               </div>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl font-bold text-[#191918] leading-[1.48] tracking-[-0.02em]">
-                “가족을 진료하는 마음으로
-                <br />
-                항상 최선을 다하겠습니다.”
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl font-bold text-[#191918] tracking-[-0.02em]">
+                <span className="block leading-[1.45] sm:leading-[1.45]">
+                  “가족을 진료하는 마음으로
+                </span>
+                <span className="block mt-2 sm:mt-2.5 leading-[1.45] sm:leading-[1.45]">
+                  항상 최선을 다하겠습니다.”
+                </span>
               </h2>
               <p className="text-stone-600 leading-[1.9] text-base">
                 병원을 찾는 발걸음이 무겁지 않도록, 따뜻하고 쾌적한 대기 공간과 대학병원급 정밀 검사 환경을 갖추었습니다.

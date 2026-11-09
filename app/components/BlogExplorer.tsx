@@ -147,7 +147,7 @@ export default function BlogExplorer({ posts, showFeatured = true }: BlogExplore
                                     </div>
 
                                     {/* Title with Breathable Line-Height */}
-                                    <h3 className="font-serif-editorial text-2xl sm:text-3xl lg:text-[2.05rem] font-bold text-[#191918] group-hover:text-[#0B3B46] transition-colors leading-[1.52] tracking-[-0.018em] mb-5">
+                                    <h3 className="font-serif-editorial text-2xl sm:text-3xl lg:text-[2.05rem] font-bold text-[#191918] group-hover:text-[#0B3B46] transition-colors leading-[1.54] sm:leading-[1.54] lg:leading-[1.54] tracking-[-0.018em] mb-5">
                                         {featuredPost.title}
                                     </h3>
 
@@ -311,7 +311,7 @@ export default function BlogExplorer({ posts, showFeatured = true }: BlogExplore
                                         </div>
 
                                         {/* Full Article Title (Line-height 1.56 for effortless Korean reading) */}
-                                        <h3 className="font-serif-editorial text-[1.22rem] sm:text-[1.28rem] font-bold text-[#191918] mb-3.5 line-clamp-2 group-hover:text-[#0B3B46] transition-colors leading-[1.56] tracking-[-0.015em]">
+                                        <h3 className="font-serif-editorial text-[1.22rem] sm:text-[1.28rem] font-bold text-[#191918] mb-3.5 line-clamp-2 group-hover:text-[#0B3B46] transition-colors leading-[1.56] sm:leading-[1.56] tracking-[-0.015em]">
                                             {post.title}
                                         </h3>
 

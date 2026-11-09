@@ -228,7 +228,7 @@ export default async function BlogPostPage({ params }: Props) {
 
                     <h1
                         itemProp="headline"
-                        className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.55rem] font-bold text-[#191918] leading-[1.48] tracking-[-0.018em] mb-8"
+                        className="font-serif-editorial text-3xl sm:text-4xl lg:text-[2.55rem] font-bold text-[#191918] leading-[1.5] sm:leading-[1.5] lg:leading-[1.5] tracking-[-0.018em] mb-8"
                     >
                         {post.title}
                     </h1>
@@ -368,7 +368,7 @@ export default async function BlogPostPage({ params }: Props) {
                                 </svg>
                                 <div>
                                     <dt className="sr-only">진료시간</dt>
-                                    <dd>평일 08:30–19:00 · 토요일 08:30–14:00 (노런치)</dd>
+                                    <dd>평일 08:30–19:00 · 토요일 08:30–14:00 (점심시간 없이 진료)</dd>
                                 </div>
                             </div>
                         </dl>
